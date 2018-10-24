@@ -175,7 +175,17 @@ public class Maze {
 		}
 
 		HashMap<MazeNode, MazeNode> parentMap = new HashMap<MazeNode, MazeNode>();
-		
+		boolean found = this.dfsSearch(start, goal, parentMap);
+		if (!found) {
+			System.out.println("No path exists");
+			return new LinkedList<MazeNode>();
+		}
+
+		List<MazeNode> path = this.reconstructPath(start, goal, parentMap);
+		return path;
+	}
+
+	private boolean dfsSearch(MazeNode start, MazeNode goal, HashMap<MazeNode, MazeNode> parentMap) {
 		HashSet<MazeNode> visited = new HashSet<MazeNode>();
 		Stack<MazeNode> toExplore = new Stack<MazeNode>();
 		toExplore.push(start);
@@ -199,12 +209,10 @@ public class Maze {
 				}
 			}
 		}
-		
-		if (!found) {
-			System.out.println("No path exists");
-			return new LinkedList<MazeNode>();
-		}
-
+		return found;
+	}
+	
+	private List<MazeNode> reconstructPath(MazeNode start, MazeNode goal, HashMap<MazeNode, MazeNode> parentMap) {
 		// reconstruct the path
 		LinkedList<MazeNode> path = new LinkedList<MazeNode>();
 		MazeNode curr = goal;
@@ -215,8 +223,6 @@ public class Maze {
 		path.addFirst(start);
 		return path;
 	}
-	
-	
 	/** breadth first search from (startRow,startCol) to (endRow,endCol)
 	 * 
 	 * Note: This method could also stand to be refactored.
