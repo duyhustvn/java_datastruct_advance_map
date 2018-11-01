@@ -8,7 +8,9 @@
 package roadgraph;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -24,7 +26,10 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
-	
+	private int numVerticles;
+	private int numEdges;
+	HashMap<GeographicPoint, MapNode> nodes;
+
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -32,6 +37,9 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 3
+		nodes = new HashMap<GeographicPoint, MapNode>();
+		numEdges = 0;
+		numVerticles = 0;
 	}
 	
 	/**
@@ -41,7 +49,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 3
-		return 0;
+		return numVerticles;
 	}
 	
 	/**
@@ -61,10 +69,12 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 3
-		return 0;
+		return numEdges;
 	}
 
-	
+	public MapNode getVertex(GeographicPoint location) {
+		return nodes.get(location);
+	}
 	
 	/** Add a node corresponding to an intersection at a Geographic Point
 	 * If the location is already in the graph or null, this method does 
@@ -76,6 +86,8 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 3
+
+
 		return false;
 	}
 	
