@@ -8,8 +8,12 @@
 package roadgraph;
 
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import geography.GeographicPoint;
@@ -28,8 +32,21 @@ public class MapGraph {
 	private int numEdges;
 	HashMap<GeographicPoint, MapNode> nodes;
 
-	
-	/** 
+	private final static Logger LOGGER = Logger.getLogger(MapGraph.class.getName());
+	FileHandler fh;
+
+    {
+        try {
+            fh = new FileHandler("logger/info.log");
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
 	 * Create a new empty MapGraph 
 	 */
 	public MapGraph()
@@ -97,10 +114,12 @@ public class MapGraph {
 		List<MapEdge> neighbors = new ArrayList<MapEdge>();
 		MapNode currentNode = new MapNode(location, neighbors);
 		if (foundNode == null) {
+            LOGGER.info("Add node " + location);
+		    this.numVerticles++;
             nodes.put(location, currentNode);
 			return true;
 		}
-
+        LOGGER.info("Node " + location + " is already exists");
 		return false;
 	}
 	
@@ -232,6 +251,9 @@ public class MapGraph {
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
 
+		firstMap.addVertex(new GeographicPoint(1.0, 20.0));
+        firstMap.addVertex(new GeographicPoint(1.0, 20.0));
+        System.out.println("Number of verticles: " + firstMap.getNumVertices());
 		Set<GeographicPoint> geographicPointSet = firstMap.getVertices();
 		for (GeographicPoint geographicPoint : geographicPointSet) {
             System.out.println(geographicPoint + " ");
