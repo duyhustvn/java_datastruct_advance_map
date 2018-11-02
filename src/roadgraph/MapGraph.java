@@ -8,12 +8,10 @@
 package roadgraph;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
+import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import geography.GeographicPoint;
 import util.GraphLoader;
 
@@ -58,8 +56,15 @@ public class MapGraph {
 	 */
 	public Set<GeographicPoint> getVertices()
 	{
-		//TODO: Implement this method in WEEK 3
-		return null;
+        //TODO: Implement this method in WEEK 3
+	    Set<GeographicPoint> allVertices = new HashSet<GeographicPoint>();
+	    Set<Map.Entry<GeographicPoint, MapNode>> set = nodes.entrySet();
+	    Iterator<Map.Entry<GeographicPoint, MapNode>> itr = set.iterator();
+	    while(itr.hasNext()) {
+            Map.Entry<GeographicPoint, MapNode> node = itr.next();
+            allVertices.add(node.getKey());
+        }
+		return allVertices;
 	}
 	
 	/**
@@ -87,6 +92,14 @@ public class MapGraph {
 	{
 		// TODO: Implement this method in WEEK 3
 
+		// check if node/vertex is exists
+		MapNode foundNode = this.getVertex(location);
+		List<MapEdge> neighbors = new ArrayList<MapEdge>();
+		MapNode currentNode = new MapNode(location, neighbors);
+		if (foundNode == null) {
+            nodes.put(location, currentNode);
+			return true;
+		}
 
 		return false;
 	}
@@ -218,6 +231,12 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
+
+		Set<GeographicPoint> geographicPointSet = firstMap.getVertices();
+		for (GeographicPoint geographicPoint : geographicPointSet) {
+            System.out.println(geographicPoint + " ");
+        }
+
 		
 		// You can use this method for testing.  
 		
