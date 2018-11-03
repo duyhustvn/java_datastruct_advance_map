@@ -27,7 +27,14 @@ public class MapNode {
         return neighbors;
     }
 
-    public void setNeighbors(List<MapEdge> neighbors) {
-        this.neighbors = neighbors;
+    public void addEdge(MapEdge edge) {
+        this.neighbors.add(edge);
     }
+
+    public boolean isEqual(MapNode node) {
+        return  this.getLocation().getX() == node.getLocation().getX() &&
+        this.getLocation().getY() == node.getLocation().getY();
+    }
+
+
 }

@@ -33,17 +33,17 @@ public class MapGraph {
 	HashMap<GeographicPoint, MapNode> nodes;
 
 	private final static Logger LOGGER = Logger.getLogger(MapGraph.class.getName());
-	FileHandler fh;
-
-    {
-        try {
-            fh = new FileHandler("logger/info.log");
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//	FileHandler fh;
+//
+//    {
+//        try {
+//            fh = new FileHandler("logger/info.log");
+//            SimpleFormatter formatter = new SimpleFormatter();
+//            fh.setFormatter(formatter);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     /**
@@ -122,6 +122,17 @@ public class MapGraph {
         LOGGER.info("Node " + location + " is already exists");
 		return false;
 	}
+
+    // Check if edge is added
+	public boolean isEdgeAdded(MapNode startNode, MapNode endNode) {
+		List<MapEdge> neighbors = startNode.getNeighbors();
+		for (MapEdge edge: neighbors) {
+			if (edge.isEqual(startNode, endNode)) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	/**
 	 * Adds a directed edge to the graph from pt1 to pt2.  
@@ -139,9 +150,35 @@ public class MapGraph {
 			String roadType, double length) throws IllegalArgumentException {
 
 		//TODO: Implement this method in WEEK 3
-		
+		if (length <= 0) {
+			LOGGER.warning("Length is: " + length);
+			throw new IllegalArgumentException("Length is " + length);
+		}
+
+		MapNode startNode = this.getVertex(from);
+		if (startNode == null) {
+			LOGGER.warning("Node " + from + " is not add to map");
+			throw new IllegalArgumentException( "Node " + from + " is not add to map");
+		}
+
+		MapNode endNode = this.getVertex(to);
+		if (startNode == null) {
+			LOGGER.warning("Node " + to + " is not add to map");
+			throw new IllegalArgumentException("Node " + to + " is not add to map");
+		}
+
+
+ 		boolean isEdgeAdded = this.isEdgeAdded(startNode, endNode);
+		if (isEdgeAdded) {
+			LOGGER.info( startNode.getLocation() + " and " + endNode.getLocation() + " is alredy added to edge ");
+		} else {
+			MapEdge edge = new MapEdge(startNode, endNode, roadName, roadType);
+			startNode.addEdge(edge);
+			LOGGER.info("Add " + startNode.getLocation() + " and " + endNode.getLocation() + " to edge ");
+			this.numEdges++;
+		}
 	}
-	
+
 
 	/** Find the path from start to goal using breadth first search
 	 * 
@@ -253,13 +290,21 @@ public class MapGraph {
 
 		firstMap.addVertex(new GeographicPoint(1.0, 20.0));
         firstMap.addVertex(new GeographicPoint(1.0, 20.0));
-        System.out.println("Number of verticles: " + firstMap.getNumVertices());
-		Set<GeographicPoint> geographicPointSet = firstMap.getVertices();
-		for (GeographicPoint geographicPoint : geographicPointSet) {
-            System.out.println(geographicPoint + " ");
-        }
 
-		
+		System.out.println("Number of edge " +  firstMap.getNumEdges());
+
+		GeographicPoint startNode = new GeographicPoint(4.0, -1.0);
+		GeographicPoint endNode = new GeographicPoint(8.0, -1.0);
+		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
+		System.out.println("Number of edge " +  firstMap.getNumEdges());
+
+		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
+		System.out.println("Number of edge " +  firstMap.getNumEdges());
+
+		startNode = new GeographicPoint(4.0, -1.0);
+		endNode = new GeographicPoint(8.0, -1.0);
+		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
+		System.out.println("Number of edge " +  firstMap.getNumEdges());
 		// You can use this method for testing.  
 		
 		
