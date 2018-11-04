@@ -189,7 +189,7 @@ public class MapGraph {
 	 */
 
 	/** Algorithm
-	 * Path: HashMap<startNode, List<MapNode>> store the path from start to goal
+	 * Path: HashMap<startNode, MapNode> store the path from start to goal
 	 * Queue: Queue<MapNode> store the next MapNode to traversal
 	 * Visited: HashSet<startNode, List<MapNode>> store node that is visited
 	 *
@@ -209,27 +209,47 @@ public class MapGraph {
 	    // return bfs(start, goal, temp);
 		HashSet<MapNode> visited = new HashSet<MapNode>();
 		// HashMap<MapNode, MapNode> path = new HashMap<MapNode, MapNode>();
-		List<GeographicPoint> path = new ArrayList<GeographicPoint>();
+		HashMap<MapNode, MapNode> path = new HashMap<MapNode, MapNode>();
 		Queue<MapNode> queue = new LinkedList<MapNode>();
 
 		MapNode startNode = nodes.get(start);
 		MapNode goalNode = nodes.get(goal);
 		queue.add(startNode);
-		while(queue.size() == 0) {
+		visited.add(startNode);
+		while(queue.size() != 0) {
 			MapNode currentNode = queue.remove();
 			if (currentNode.isEqual(goalNode)) {
-				return path;
+				break;
 			}
 			List<MapEdge> mapEdges = currentNode.getNeighbors();
 			for (MapEdge edge: mapEdges) {
 				MapNode neighbor = edge.getEnd();
 				if (visited.contains(neighbor)) continue;
 				visited.add(neighbor);
-				path.add(neighbor.getLocation());
+				path.put(neighbor, currentNode);
 				queue.add(neighbor);
 			}
 		}
-		return path;
+		return this.buildPath(startNode, goalNode, path);
+	}
+
+	public List<GeographicPoint> buildPath(MapNode startNode, MapNode goalNode, HashMap<MapNode, MapNode> path) {
+//		List<GeographicPoint> buildPath = new ArrayList<GeographicPoint>();
+//		Set<Map.Entry<MapNode, MapNode>> set = path.entrySet();
+//		Iterator<Map.Entry<MapNode, MapNode>> itr = set.iterator();
+//		while(itr.hasNext()) {
+//			Map.Entry<MapNode, MapNode> node = itr.next();
+//			System.out.println(node.getKey().getLocation() + ": " + node.getValue().getLocation());
+//		}
+		List<GeographicPoint> buildPath = new ArrayList<GeographicPoint>();
+		buildPath.add(goalNode.getLocation());
+		MapNode curr = path.get(goalNode);
+		buildPath.add(curr.getLocation());
+		while (!curr.isEqual(startNode)) {
+			curr = path.get(curr);
+			buildPath.add(curr.getLocation());
+		}
+		return buildPath;
 	}
 	
 	/** Find the path from start to goal using breadth first search
@@ -327,26 +347,26 @@ public class MapGraph {
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
 
-		firstMap.addVertex(new GeographicPoint(1.0, 20.0));
-        firstMap.addVertex(new GeographicPoint(1.0, 20.0));
+//		firstMap.addVertex(new GeographicPoint(1.0, 20.0));
+//        firstMap.addVertex(new GeographicPoint(1.0, 20.0));
+//
+//		System.out.println("Number of edge " +  firstMap.getNumEdges());
+//
+//		GeographicPoint startNode = new GeographicPoint(4.0, -1.0);
+//		GeographicPoint endNode = new GeographicPoint(8.0, -1.0);
+//		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
+//		System.out.println("Number of edge " +  firstMap.getNumEdges());
+//
+//		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
+//		System.out.println("Number of edge " +  firstMap.getNumEdges());
+//
+//		startNode = new GeographicPoint(4.0, -1.0);
+//		endNode = new GeographicPoint(8.0, -1.0);
+//		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
+//		System.out.println("Number of edge " +  firstMap.getNumEdges());
 
-		System.out.println("Number of edge " +  firstMap.getNumEdges());
-
-		GeographicPoint startNode = new GeographicPoint(4.0, -1.0);
-		GeographicPoint endNode = new GeographicPoint(8.0, -1.0);
-		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
-		System.out.println("Number of edge " +  firstMap.getNumEdges());
-
-		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
-		System.out.println("Number of edge " +  firstMap.getNumEdges());
-
-		startNode = new GeographicPoint(4.0, -1.0);
-		endNode = new GeographicPoint(8.0, -1.0);
-		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
-		System.out.println("Number of edge " +  firstMap.getNumEdges());
-		// You can use this method for testing.  
-
-		List<GeographicPoint> geographicPointList = firstMap.bfs(new GeographicPoint(4.0, 1.0), new GeographicPoint(8.0, -1.0));
+		List<GeographicPoint> geographicPointList = firstMap.bfs(new GeographicPoint(6.5, 0.0), new GeographicPoint(8.0, -1.0));
+		System.out.println("Path");
 		for (GeographicPoint geographicPoint: geographicPointList) {
 			System.out.println(geographicPoint.getX() + " " + geographicPoint.getY());
 		}
