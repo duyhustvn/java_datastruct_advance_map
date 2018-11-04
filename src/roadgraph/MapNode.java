@@ -35,6 +35,4 @@ public class MapNode {
         return  this.getLocation().getX() == node.getLocation().getX() &&
         this.getLocation().getY() == node.getLocation().getY();
     }
-
-
 }

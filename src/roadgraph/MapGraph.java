@@ -187,10 +187,49 @@ public class MapGraph {
 	 * @return The list of intersections that form the shortest (unweighted)
 	 *   path from start to goal (including both start and goal).
 	 */
+
+	/** Algorithm
+	 * Path: HashMap<startNode, List<MapNode>> store the path from start to goal
+	 * Queue: Queue<MapNode> store the next MapNode to traversal
+	 * Visited: HashSet<startNode, List<MapNode>> store node that is visited
+	 *
+	 * Add startNode to queue
+	 * while(queue is not null):
+	 * 		dequeue the first element as current node
+	 * 		if (current == goalNode) return ;
+	 * 		get the neighbors of current node
+	 * 		for each node n in neighbors and n is not visited:
+	 * 			add n to visited
+	 *			add current, n to path
+	 *			enqueue n to queue
+	 */
 	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal) {
 		// Dummy variable for calling the search algorithms
-        Consumer<GeographicPoint> temp = (x) -> {};
-        return bfs(start, goal, temp);
+        // Consumer<GeographicPoint> temp = (x) -> {};
+	    // return bfs(start, goal, temp);
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		// HashMap<MapNode, MapNode> path = new HashMap<MapNode, MapNode>();
+		List<GeographicPoint> path = new ArrayList<GeographicPoint>();
+		Queue<MapNode> queue = new LinkedList<MapNode>();
+
+		MapNode startNode = nodes.get(start);
+		MapNode goalNode = nodes.get(goal);
+		queue.add(startNode);
+		while(queue.size() == 0) {
+			MapNode currentNode = queue.remove();
+			if (currentNode.isEqual(goalNode)) {
+				return path;
+			}
+			List<MapEdge> mapEdges = currentNode.getNeighbors();
+			for (MapEdge edge: mapEdges) {
+				MapNode neighbor = edge.getEnd();
+				if (visited.contains(neighbor)) continue;
+				visited.add(neighbor);
+				path.add(neighbor.getLocation());
+				queue.add(neighbor);
+			}
+		}
+		return path;
 	}
 	
 	/** Find the path from start to goal using breadth first search
@@ -306,8 +345,12 @@ public class MapGraph {
 		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
 		System.out.println("Number of edge " +  firstMap.getNumEdges());
 		// You can use this method for testing.  
-		
-		
+
+		List<GeographicPoint> geographicPointList = firstMap.bfs(new GeographicPoint(4.0, 1.0), new GeographicPoint(8.0, -1.0));
+		for (GeographicPoint geographicPoint: geographicPointList) {
+			System.out.println(geographicPoint.getX() + " " + geographicPoint.getY());
+		}
+
 		/* Here are some test cases you should try before you attempt 
 		 * the Week 3 End of Week Quiz, EVEN IF you score 100% on the 
 		 * programming assignment.
