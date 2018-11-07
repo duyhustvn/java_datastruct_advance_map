@@ -203,7 +203,7 @@ public class MapGraph {
 	 *			add current, n to path
 	 *			enqueue n to queue
 	 */
-	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal) {
+	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal, Consumer<GeographicPoint> nodeSearched) {
 		// Dummy variable for calling the search algorithms
         // Consumer<GeographicPoint> temp = (x) -> {};
 	    // return bfs(start, goal, temp);
@@ -225,6 +225,7 @@ public class MapGraph {
 			for (MapEdge edge: mapEdges) {
 				MapNode neighbor = edge.getEnd();
 				if (visited.contains(neighbor)) continue;
+				nodeSearched.accept(neighbor.getLocation());
 				visited.add(neighbor);
 				path.put(neighbor, currentNode);
 				queue.add(neighbor);
@@ -260,8 +261,7 @@ public class MapGraph {
 	 * @return The list of intersections that form the shortest (unweighted)
 	 *   path from start to goal (including both start and goal).
 	 */
-	public List<GeographicPoint> bfs(GeographicPoint start, 
-			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
+	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal)
 	{
 		// TODO: Implement this method in WEEK 3
 		
