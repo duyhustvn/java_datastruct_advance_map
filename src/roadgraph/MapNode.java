@@ -8,7 +8,9 @@ public class MapNode {
     private GeographicPoint location;
     private List<MapEdge> neighbors;
 
-    public MapNode() {};
+    public MapNode(GeographicPoint location) {
+        this.location = location;
+    };
 
     public MapNode(GeographicPoint location, List<MapEdge> neighbors) {
         this.location = location;

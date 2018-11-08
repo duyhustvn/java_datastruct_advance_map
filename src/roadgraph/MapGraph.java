@@ -302,11 +302,60 @@ public class MapGraph {
 	 * @return The list of intersections that form the shortest path from 
 	 *   start to goal (including both start and goal).
 	 */
+
+	/**
+	 * Algorithm:
+	 * path: HashMap<neighbor, current>
+	 * visited: HashSet<start, List<MapNode>>
+	 *
+	 * Add startNode to queue
+	 * while queue is not empty:
+	 * 	dequeue the head element as current
+	 * 	if current == goalNode:
+	 * 		return path
+	 * 	for each current's neighbor, n and n is not visited:
+	 * 		get sum of distance from current to startNode through some node
+	 * 		add n to visited
+	 * 		add to path HashMap<neighbor, current>
+	 * 		 enqueue to queue in respect of distance
+	 */
 	public List<GeographicPoint> dijkstra(GeographicPoint start, GeographicPoint goal) {
 		// Dummy variable for calling the search algorithms
 		// You do not need to change this method.
-        Consumer<GeographicPoint> temp = (x) -> {};
-        return dijkstra(start, goal, temp);
+//        Consumer<GeographicPoint> temp = (x) -> {};
+//        return dijkstra(start, goal, temp);
+
+		HashMap<MapNode, MapNode> path = new HashMap<MapNode, MapNode>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		Queue<MapNode> queue = new PriorityQueue<MapNode>();
+		boolean isFound = false;
+
+		MapNode startNode = new MapNode(start);
+		MapNode goalNode = new MapNode(goal);
+
+		queue.add(startNode);
+		while(!queue.isEmpty()) {
+			MapNode curr = queue.remove();
+			if (curr.isEqual(goalNode)) {
+				isFound = true;
+				break;
+			}
+
+			List<MapEdge> neighborEdge = curr.getNeighbors();
+			for (MapEdge edge: neighborEdge) {
+				MapNode neighborNode = edge.getEnd();
+				if (visited.contains(neighborNode)) continue;
+				visited.add(neighborNode);
+				path.put(neighborNode, curr);
+				queue.add(neighborNode);
+			}
+		}
+
+		if (isFound) {
+			return this.buildPath(startNode, goalNode, path);
+		} else {
+			return null;
+		}
 	}
 	
 	/** Find the path from start to goal using Dijkstra's algorithm
