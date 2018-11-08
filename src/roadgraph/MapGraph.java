@@ -242,14 +242,19 @@ public class MapGraph {
 //			Map.Entry<MapNode, MapNode> node = itr.next();
 //			System.out.println(node.getKey().getLocation() + ": " + node.getValue().getLocation());
 //		}
+		double distance = 0;
 		List<GeographicPoint> buildPath = new ArrayList<GeographicPoint>();
 		buildPath.add(goalNode.getLocation());
 		MapNode curr = path.get(goalNode);
 		buildPath.add(curr.getLocation());
+		distance += curr.getLocation().distance(goalNode.getLocation());
 		while (!curr.isEqual(startNode)) {
+			MapNode prev = curr;
 			curr = path.get(curr);
+ 			distance += curr.getLocation().distance(prev.getLocation());
 			buildPath.add(curr.getLocation());
 		}
+		System.out.println("distance: " + distance);
 		return buildPath;
 	}
 	
@@ -257,18 +262,36 @@ public class MapGraph {
 	 * 
 	 * @param start The starting location
 	 * @param goal The goal location
-	 * @param nodeSearched A hook for visualization.  See assignment instructions for how to use it.
 	 * @return The list of intersections that form the shortest (unweighted)
 	 *   path from start to goal (including both start and goal).
 	 */
 	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal)
 	{
 		// TODO: Implement this method in WEEK 3
-		
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		// HashMap<MapNode, MapNode> path = new HashMap<MapNode, MapNode>();
+		HashMap<MapNode, MapNode> path = new HashMap<MapNode, MapNode>();
+		Queue<MapNode> queue = new LinkedList<MapNode>();
 
-		return null;
+		MapNode startNode = nodes.get(start);
+		MapNode goalNode = nodes.get(goal);
+		queue.add(startNode);
+		visited.add(startNode);
+		while(queue.size() != 0) {
+			MapNode currentNode = queue.remove();
+			if (currentNode.isEqual(goalNode)) {
+				break;
+			}
+			List<MapEdge> mapEdges = currentNode.getNeighbors();
+			for (MapEdge edge: mapEdges) {
+				MapNode neighbor = edge.getEnd();
+				if (visited.contains(neighbor)) continue;
+				visited.add(neighbor);
+				path.put(neighbor, currentNode);
+				queue.add(neighbor);
+			}
+		}
+		return this.buildPath(startNode, goalNode, path);
 	}
 	
 
@@ -365,10 +388,10 @@ public class MapGraph {
 //		firstMap.addEdge(startNode, endNode, "short", "connector", startNode.distance(endNode));
 //		System.out.println("Number of edge " +  firstMap.getNumEdges());
 
-		List<GeographicPoint> geographicPointList = firstMap.bfs(new GeographicPoint(6.5, 0.0), new GeographicPoint(8.0, -1.0));
+		List<GeographicPoint> geographicPointList = firstMap.bfs(new GeographicPoint(4.0, 1.0), new GeographicPoint(8.0, -1.0));
 		System.out.println("Path");
 		for (GeographicPoint geographicPoint: geographicPointList) {
-			System.out.println(geographicPoint.getX() + " " + geographicPoint.getY());
+			System.out.println(geographicPoint.toString());
 		}
 
 		/* Here are some test cases you should try before you attempt 
