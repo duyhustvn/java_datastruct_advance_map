@@ -4,6 +4,9 @@ public class NodeWithDistance implements Comparable {
     private MapNode node;
     private double distance;
 
+    public NodeWithDistance() {
+    }
+
     public NodeWithDistance(MapNode node, double distance) {
         this.node = node;
         this.distance = distance;
@@ -37,5 +40,13 @@ public class NodeWithDistance implements Comparable {
         } else {
             return -1;
         }
+    }
+
+    public boolean isEqual(NodeWithDistance node) {
+        boolean sameLocation = (this.getNode().getLocation().getX() == node.getNode().getLocation().getX() &&
+                this.getNode().getLocation().getY() == node.getNode().getLocation().getY());
+        boolean sameDistance = (this.getDistance() == node.getDistance());
+        if (sameDistance && sameDistance) return true;
+        return false;
     }
 }

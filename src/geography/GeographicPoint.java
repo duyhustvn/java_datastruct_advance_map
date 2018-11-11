@@ -44,6 +44,12 @@ public class GeographicPoint extends Double {
     {
     	return "Lat: " + getX() + ", Lon: " + getY();
     }
-	
+
+	public static void main(String[] args) {
+		GeographicPoint geographicPoint1 = new GeographicPoint(8, -1.0);
+		GeographicPoint geographicPoint2 = new GeographicPoint(7, 3);
+		System.out.println(geographicPoint1.distance(geographicPoint2));
+
+	}
 	
 }
