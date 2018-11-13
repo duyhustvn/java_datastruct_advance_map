@@ -85,7 +85,7 @@ public class MapGraph {
         }
 		return allVertices;
 	}
-	
+
 	/**
 	 * Get the number of road segments in the graph
 	 * @return The number of edges in the graph.
@@ -259,12 +259,6 @@ public class MapGraph {
 	}
 
 	public void printVisited(List<MapNode> visited) {
-//		Set<MapNode> set = new HashSet<MapNode>(visited);
-//		int i = 1;
-//		for (MapNode s: set) {
-//			System.out.println(i + " " + s.getLocation().toString());
-//			i += 1;
-//		}
 		int i = 1;
 		for (MapNode node: visited) {
 			System.out.println(i + " " + node.getLocation().toString());
@@ -313,7 +307,6 @@ public class MapGraph {
 		}
 	}
 
-
 	/** Find the path from start to goal using Dijkstra's algorithm
 	 * 
 	 * @param start The starting location
@@ -324,68 +317,94 @@ public class MapGraph {
 
 	/**
 	 * Algorithm:
-	 * path: HashMap<neighbor, current>
-	 * visited: HashSet<start, List<MapNode>>
+	 * parent: HashMap<MapNode, MapNode>
+	 * visited: HashSet<start>
+	 * queue: PriorityQueue() base of distance
 	 *
-	 * Add startNode to queue
+	 * Set distance for all node to infinity
+	 * Add startNode to queue with distance = 0
 	 * while queue is not empty:
 	 * 	dequeue the head element as current
+	 * 	if current is not in visited
+	 * 		Add to visited
 	 * 	if current == goalNode:
-	 * 		return path
+	 * 		return parent
 	 * 	for each current's neighbor, n and n is not visited:
-	 * 		get sum of distance from current to startNode through some node
-	 * 		add n to visited
-	 * 		add to path HashMap<neighbor, current>
-	 * 		 enqueue to queue in respect of distance
+	 * 		get sum of distance from n to startNode
+	 * 		if distance from n to startNode shoter
+	 * 			update parent
+	 * 		 	enqueue n
 	 */
 	public List<GeographicPoint> dijkstra(GeographicPoint start, GeographicPoint goal) {
-		HashMap<NodeWithDistance, NodeWithDistance> path = new HashMap<NodeWithDistance, NodeWithDistance>();
-		List<MapNode> visited = new LinkedList<MapNode>();
-		Queue<NodeWithDistance> queue = new PriorityQueue<NodeWithDistance>();
-		boolean isFound = false;
-
+		HashMap<MapNode, Double> distance = initDistance();
+//		Queue<MapNode> queue = new PriorityQueue<>(new Comparator<MapNode>() {
+//			@Override
+//			public int compare(MapNode o1, MapNode o2) {
+//				if (distance.get(o1) - distance.get(o2) > 0) return 1;
+//				else return -1;
+//			}
+//		});
+		Boolean isFound = false;
+		Queue<MapNode> queue = dijkstraComparator(distance);
+		List<MapNode> visited = new ArrayList<MapNode>();
+		HashMap<MapNode, MapNode> parent = new HashMap<MapNode, MapNode>();
 		MapNode startNode = nodes.get(start);
 		MapNode goalNode = nodes.get(goal);
-		NodeWithDistance startNodeWithDistance = new NodeWithDistance(startNode);
-		NodeWithDistance curr = new NodeWithDistance();
 
-		queue.add(new NodeWithDistance(startNode));
+		distance.put(startNode, 0.0);
+
+		queue.add(startNode);
 		while(!queue.isEmpty()) {
-			curr = queue.remove();
-			if (visited.contains(curr.getNode())) continue;
-			visited.add(curr.getNode());
-			if (curr.getNode().isEqual(goalNode)) {
+			MapNode curr = queue.remove();
+
+			if (visited.contains(curr)) continue;
+			visited.add(curr);
+
+			if (curr.isEqual(goalNode)) {
 				isFound = true;
 				break;
 			}
 
-			List<MapNode>  neighbors = curr.getNode().getNeighbors();
-			for (MapNode neighbor: neighbors) {
-				double distance = curr.getDistance() + curr.getNode().getLocation().distance(neighbor.getLocation());
-				NodeWithDistance neighborNodeWithDistance = new NodeWithDistance(neighbor, distance);
-				path.put(neighborNodeWithDistance, curr);
-				queue.add(neighborNodeWithDistance);
+			List<MapNode> neighbor = curr.getNeighbors();
+			for (MapNode next: neighbor) {
+				double dist = distance.get(curr) + curr.getLocation().distance(next.getLocation());
+				if (dist < distance.get(next)) {
+					distance.put(next, dist);
+					parent.put(next, curr);
+					queue.add(next);
+				}
 			}
 		}
-
+//		printVisited(visited);
 		if (isFound) {
-			System.out.println("Path: ");
-			return this.buildPathDijkstra(startNodeWithDistance, curr, path);
+			return this.buildPath(startNode, goalNode, parent);
 		} else {
 			return null;
 		}
 	}
 
-	public List<GeographicPoint> buildPathDijkstra (NodeWithDistance startNode, NodeWithDistance goalNode, HashMap<NodeWithDistance, NodeWithDistance> parent) {
-		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
-		path.addFirst(goalNode.getNode().getLocation());
-		NodeWithDistance curr = parent.get(goalNode);
-		while (!curr.isEqual(startNode)) {
-			path.addFirst(curr.getNode().getLocation());
-			curr = parent.get(curr);
+	public PriorityQueue<MapNode> dijkstraComparator(HashMap<MapNode, Double> distance) {
+		return new PriorityQueue<>(new Comparator<MapNode>() {
+			@Override
+			public int compare(MapNode o1, MapNode o2) {
+				if (distance.get(o1) - distance.get(o2) > 0) {
+					return 1;
+				}  else {
+					return -1;
+				}
+			}
+		});
+	}
+
+	public HashMap<MapNode, Double> initDistance() {
+		HashMap<MapNode, Double> distance = new HashMap<MapNode, Double>();
+		Set<Map.Entry<GeographicPoint, MapNode>> set = nodes.entrySet();
+		Iterator<Map.Entry<GeographicPoint, MapNode>> itr = set.iterator();
+		while(itr.hasNext()) {
+			MapNode node = itr.next().getValue();
+			distance.put(node, Double.POSITIVE_INFINITY);
 		}
-		path.addFirst(startNode.getNode().getLocation());
-		return path;
+		return distance;
 	}
 	
 	/** Find the path from start to goal using Dijkstra's algorithm
@@ -400,42 +419,49 @@ public class MapGraph {
 										  GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 4
-
-		// Hook for visualization.  See writeup.
-		//nodeSearched.accept(next.getLocation());
-		HashMap<NodeWithDistance, NodeWithDistance> path = new HashMap<NodeWithDistance, NodeWithDistance>();
-		List<MapNode> visited = new LinkedList<MapNode>();
-		Queue<NodeWithDistance> queue = new PriorityQueue<NodeWithDistance>();
-		boolean isFound = false;
-
+		HashMap<MapNode, Double> distance = initDistance();
+//		Queue<MapNode> queue = new PriorityQueue<>(new Comparator<MapNode>() {
+//			@Override
+//			public int compare(MapNode o1, MapNode o2) {
+//				if (distance.get(o1) - distance.get(o2) > 0) return 1;
+//				else return -1;
+//			}
+//		});
+		Boolean isFound = false;
+		Queue<MapNode> queue = dijkstraComparator(distance);
+		List<MapNode> visited = new ArrayList<MapNode>();
+		HashMap<MapNode, MapNode> parent = new HashMap<MapNode, MapNode>();
 		MapNode startNode = nodes.get(start);
 		MapNode goalNode = nodes.get(goal);
-		NodeWithDistance startNodeWithDistance = new NodeWithDistance(startNode);
-		NodeWithDistance curr = new NodeWithDistance();
 
-		queue.add(new NodeWithDistance(startNode));
+		distance.put(startNode, 0.0);
+
+		queue.add(startNode);
 		while(!queue.isEmpty()) {
-			curr = queue.remove();
-			if (visited.contains(curr.getNode())) continue;
-			nodeSearched.accept(curr.getNode().getLocation());
-			visited.add(curr.getNode());
-			if (curr.getNode().isEqual(goalNode)) {
+			MapNode curr = queue.remove();
+
+			if (visited.contains(curr)) continue;
+			visited.add(curr);
+			nodeSearched.accept(curr.getLocation());
+
+			if (curr.isEqual(goalNode)) {
 				isFound = true;
 				break;
 			}
 
-			List<MapNode>  neighbors = curr.getNode().getNeighbors();
-			for (MapNode neighbor: neighbors) {
-				double distance = curr.getDistance() + curr.getNode().getLocation().distance(neighbor.getLocation());
-				NodeWithDistance neighborNodeWithDistance = new NodeWithDistance(neighbor, distance);
-				path.put(neighborNodeWithDistance, curr);
-				queue.add(neighborNodeWithDistance);
+			List<MapNode> neighbor = curr.getNeighbors();
+			for (MapNode next: neighbor) {
+				double dist = distance.get(curr) + curr.getLocation().distance(next.getLocation());
+				if (dist < distance.get(next)) {
+					distance.put(next, dist);
+					parent.put(next, curr);
+					queue.add(next);
+				}
 			}
 		}
-
+//		printVisited(visited);
 		if (isFound) {
-			System.out.println("Path: ");
-			return this.buildPathDijkstra(startNodeWithDistance, curr, path);
+			return this.buildPath(startNode, goalNode, parent);
 		} else {
 			return null;
 		}
