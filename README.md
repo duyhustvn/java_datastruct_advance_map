@@ -1,8 +1,10 @@
 This repo hosts code following the course [Advanced Data Structures in Java](https://www.coursera.org/learn/advanced-data-structures) 
 
+![](https://raw.githubusercontent.com/duyhustvn/java_datastruct_advance_map/master/images/map.gif)
+
 ## REQUIREMENT 
 1. Oracle jdk 8 
-2. An google map API key. Get one and replace key in file src/html/index.html
+2. An google map API key. Get one at this [link](https://developers.google.com/maps/documentation/javascript/) and replace key in file src/html/index.html
 
 ## HOW TO RUN
 ### Using command line
