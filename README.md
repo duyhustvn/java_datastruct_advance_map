@@ -2,7 +2,7 @@ This repo hosts code following the course [Advanced Data Structures in Java](htt
 
 | ![](https://raw.githubusercontent.com/duyhustvn/java_datastruct_advance_map/master/images/map.gif) |
 |:--:| 
-| *Demo gif* |
+| *demo.gif* |
 
 ## REQUIREMENT 
 1. Oracle jdk 8 
